@@ -35,7 +35,7 @@ GROUP BY province
 -- COMMAND ----------
 
 SELECT *
-  , (population / sum(population) OVER (ORDER BY 1) * 100) AS percentage
+  , (population / sum(population) OVER (ORDER BY 1)) * 100 AS percentage
 FROM population_by_province
 ORDER BY percentage DESC
 
@@ -46,7 +46,7 @@ ORDER BY percentage DESC
 -- COMMAND ----------
 
 SELECT *
-  , (population / sum(population) OVER (ORDER BY 1) * 100) AS percentage
+  , (population / sum(population) OVER (ORDER BY 1)) * 100 AS percentage
 FROM 
 (
   SELECT * 
