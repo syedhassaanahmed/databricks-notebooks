@@ -1,2 +1,2 @@
 # databricks-notebooks
-Collection of Databricks Notebooks
+Collection of Databricks and Jupyter Notebooks
