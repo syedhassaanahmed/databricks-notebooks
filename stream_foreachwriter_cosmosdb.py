@@ -11,9 +11,10 @@
 
 cosmosDbConfig = {
   "Endpoint" : "https://<COSMOSDB_ENDPOINT>.documents.azure.com:443/",
-  "Masterkey" : "<COSMOSDB_KEY>",
+  "Masterkey" : "<COSMOSDB_PRIMARYKEY>",
   "Database" : "<DATABASE>",
-  "Collection" : "<COLLECTION>"
+  "Collection" : "<COLLECTION>",
+  "Upsert" : "true"
 }
 
 df.writeStream.format("com.microsoft.azure.cosmosdb.spark").options(**cosmosDbConfig).start().awaitTermination()
