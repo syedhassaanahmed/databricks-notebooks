@@ -4,10 +4,6 @@
 
 # COMMAND ----------
 
-# MAGIC %md ## Create JAAS config for Kafka-enabled Event Hub
-
-# COMMAND ----------
-
 jaas = "dbfs:/kafka.jaas"
 
 dbutils.fs.rm(jaas)
@@ -61,7 +57,3 @@ df = spark.readStream.format("kafka") \
 # COMMAND ----------
 
 display(df)
-
-# COMMAND ----------
-
-

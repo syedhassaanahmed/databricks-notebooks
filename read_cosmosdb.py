@@ -3,11 +3,7 @@
 
 # COMMAND ----------
 
-# MAGIC %md [Create and attach required libraries](https://docs.azuredatabricks.net/spark/latest/data-sources/azure/cosmosdb-connector.html#create-and-attach-required-libraries)
-# MAGIC 
-# MAGIC OR
-# MAGIC 
-# MAGIC Using Maven coordinates e.g. `azure-cosmosdb-spark_2.2.0_2.11`
+# MAGIC %md [Create and attach required library (uber jar)](https://github.com/Azure/azure-cosmosdb-spark#using-databricks-notebooks)
 # MAGIC 
 # MAGIC ### Store Cosmos DB Secrets (one-time)
 # MAGIC ```

@@ -21,10 +21,6 @@ ehConf = {
 
 # COMMAND ----------
 
-# MAGIC %md ### Extract json schema from first message
-
-# COMMAND ----------
-
 rawData = spark.read.format("eventhubs").options(**ehConf).load()
 
 dfBody = rawData.selectExpr("CAST(body AS STRING)")
@@ -44,21 +40,11 @@ dbutils.fs.put(schemaFile, schema)
 
 # COMMAND ----------
 
-# MAGIC %md ### Check if schema was successfully created
-
-# COMMAND ----------
-
 # MAGIC %fs ls
 
 # COMMAND ----------
-
-# Load schema from DBFS
 
 with open("/dbfs/schema.json") as jsonData:
     schema = StructType.fromJson(json.load(jsonData))
 
 print(schema)
-
-# COMMAND ----------
-
-

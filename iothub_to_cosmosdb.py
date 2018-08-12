@@ -1,4 +1,12 @@
 # Databricks notebook source
+# MAGIC %md # Azure IoT Hub -> Azure Cosmos DB
+# MAGIC This notebook demonstrates reading IoT events from an Azure IoT Hub and writes these raw events into an Azure Cosmos DB Collection.
+# MAGIC In order to run this notebook successfully, the following connectors are required.
+# MAGIC - [azure-eventhubs-spark](https://github.com/Azure/azure-event-hubs-spark)
+# MAGIC - [azure-cosmosdb-spark (uber jar)](https://github.com/Azure/azure-cosmosdb-spark#using-databricks-notebooks)
+
+# COMMAND ----------
+
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 

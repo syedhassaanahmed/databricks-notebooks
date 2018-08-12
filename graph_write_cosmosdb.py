@@ -4,10 +4,6 @@
 
 # COMMAND ----------
 
-# MAGIC %md ## Vertex DataFrame
-
-# COMMAND ----------
-
 v = sqlContext.createDataFrame([
   ("a", "Alice", 34),
   ("b", "Bob", 36),
@@ -17,10 +13,6 @@ v = sqlContext.createDataFrame([
   ("f", "Fanny", 36),
   ("g", "Gabby", 60)
 ], ["id", "name", "age"])
-
-# COMMAND ----------
-
-# MAGIC %md ## Edge DataFrame
 
 # COMMAND ----------
 
@@ -37,10 +29,6 @@ e = sqlContext.createDataFrame([
 
 # COMMAND ----------
 
-# MAGIC %md ## Create a GraphFrame
-
-# COMMAND ----------
-
 from graphframes import *
 g = GraphFrame(v, e)
 display(g.vertices)
@@ -52,12 +40,8 @@ from pyspark.sql.types import *
 
 # COMMAND ----------
 
-# MAGIC %md ## Convert vertices and Edges to Cosmos DB internal format
+# MAGIC %md ## Convert Vertices and Edges to Cosmos DB internal format
 # MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://vincentlauzon.com/2017/09/05/hacking-accessing-a-graph-in-cosmos-db-with-sql-documentdb-api/).
-
-# COMMAND ----------
-
-# MAGIC %md ### Convert Vertices
 
 # COMMAND ----------
 
@@ -85,10 +69,6 @@ display(cosmosDbVertices)
 
 # COMMAND ----------
 
-# MAGIC %md ### Convert Edges
-
-# COMMAND ----------
-
 def to_cosmosdb_edges(dfEdges, edgeLabelColumn):
   return dfEdges.withColumn("_isEdge", lit(True)) \
     .withColumnRenamed("src", "_vertexId") \
@@ -99,10 +79,6 @@ def to_cosmosdb_edges(dfEdges, edgeLabelColumn):
 
 cosmosDbEdges = to_cosmosdb_edges(g.edges, "relationship")
 display(cosmosDbEdges)
-
-# COMMAND ----------
-
-# MAGIC %md ## Insert Vertices and Edges to Cosmos DB
 
 # COMMAND ----------
 

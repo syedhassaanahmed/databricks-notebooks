@@ -37,10 +37,6 @@
 
 # COMMAND ----------
 
-# MAGIC %md ### Create DataFrames
-
-# COMMAND ----------
-
 jdbcHostname = dbutils.preview.secret.get(scope = "sqlServer", key = "server")
 jdbcDatabase = dbutils.preview.secret.get(scope = "sqlServer", key = "database")
 
