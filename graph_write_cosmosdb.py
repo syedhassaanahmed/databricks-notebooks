@@ -47,10 +47,13 @@ from pyspark.sql.types import *
 
 import uuid
 
-def to_cosmosdb_vertices(dfVertices, vertexLabel):
+def to_cosmosdb_vertices(dfVertices, vertexLabel, partitionKey = ""):
   dfCosmosDbVertices = dfVertices
   properties = dfCosmosDbVertices.columns
-  properties.remove("id")  
+  properties.remove("id")
+  
+  if partitionKey:
+    properties.remove(partitionKey)
   
   for property in properties:
     uuidUdf = udf(lambda : str(uuid.uuid4()), StringType())
