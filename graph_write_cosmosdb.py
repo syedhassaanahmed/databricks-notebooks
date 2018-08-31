@@ -64,8 +64,10 @@ display(cosmosDbVertices)
 # COMMAND ----------
 
 def to_cosmosdb_edges(g, edgeLabelColumn, partitionKey = ""): 
+  dfEdges = g.edges
+  
   if partitionKey:
-    dfEdges = g.edges.alias("e") \
+    dfEdges = dfEdges.alias("e") \
       .join(g.vertices.alias("sv"), col("e.src") == col("sv.id")) \
       .join(g.vertices.alias("dv"), col("e.dst") == col("dv.id")) \
       .selectExpr("e.*", "sv." + partitionKey, "dv." + partitionKey + " AS _sinkPartition")
