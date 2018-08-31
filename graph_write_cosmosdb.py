@@ -51,7 +51,7 @@ def to_cosmosdb_vertices(dfVertices, vertexLabel, partitionKey = ""):
   if partitionKey:
     columns.append(partitionKey)
   
-  columns.extend(['array(named_struct("id", uuid(), "_value", {x})) AS {x}'.format(x=x) \
+  columns.extend(['nvl2({x}, array(named_struct("id", uuid(), "_value", {x})), NULL) AS {x}'.format(x=x) \
                 for x in dfVertices.columns if x not in columns])
  
   return dfVertices.selectExpr(*columns).withColumn("label", lit(vertexLabel))
