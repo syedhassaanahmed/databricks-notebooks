@@ -45,25 +45,16 @@ from pyspark.sql.types import *
 
 # COMMAND ----------
 
-import uuid
-
 def to_cosmosdb_vertices(dfVertices, vertexLabel, partitionKey = ""):
-  dfCosmosDbVertices = dfVertices
-  properties = dfCosmosDbVertices.columns
-  properties.remove("id")
+  columns = ["id"]
   
   if partitionKey:
-    properties.remove(partitionKey)
+    columns.append(partitionKey)
   
-  for property in properties:
-    uuidUdf = udf(lambda : str(uuid.uuid4()), StringType())
-    
-    dfCosmosDbVertices = dfCosmosDbVertices.withColumn(property, array(struct(
-      uuidUdf().alias("id"), 
-      col(property).alias("_value")
-    )))
-  
-  return dfCosmosDbVertices.withColumn("label", lit(vertexLabel))
+  columns.extend(['array(named_struct("id", uuid(), "_value", {x})) AS {x}'.format(x=x) \
+                for x in dfVertices.columns if x not in columns])
+ 
+  return dfVertices.selectExpr(*columns).withColumn("label", lit(vertexLabel))
 
 # COMMAND ----------
 
@@ -72,11 +63,20 @@ display(cosmosDbVertices)
 
 # COMMAND ----------
 
-def to_cosmosdb_edges(dfEdges, edgeLabelColumn):
-  return dfEdges.withColumn("_isEdge", lit(True)) \
+def to_cosmosdb_edges(g, edgeLabelColumn, partitionKey = ""): 
+  if partitionKey:
+    dfEdges = g.edges.alias("e") \
+      .join(g.vertices.alias("sv"), col("e.src") == col("sv.id")) \
+      .join(g.vertices.alias("dv"), col("e.dst") == col("dv.id")) \
+      .selectExpr("e.*", "sv." + partitionKey, "dv." + partitionKey + " AS _sinkPartition")
+
+  dfEdges = dfEdges \
+    .withColumn("_isEdge", lit(True)) \
     .withColumnRenamed("src", "_vertexId") \
     .withColumnRenamed("dst", "_sink") \
     .withColumnRenamed(edgeLabelColumn, "label")
+  
+  return dfEdges
 
 # COMMAND ----------
 
