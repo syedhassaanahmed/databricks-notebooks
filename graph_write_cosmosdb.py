@@ -82,7 +82,7 @@ def to_cosmosdb_edges(g, edgeLabelColumn, partitionKey = ""):
 
 # COMMAND ----------
 
-cosmosDbEdges = to_cosmosdb_edges(g.edges, "relationship")
+cosmosDbEdges = to_cosmosdb_edges(g, "relationship")
 display(cosmosDbEdges)
 
 # COMMAND ----------
