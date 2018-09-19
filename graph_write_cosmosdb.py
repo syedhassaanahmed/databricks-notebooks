@@ -4,6 +4,8 @@
 
 # COMMAND ----------
 
+from pyspark.sql.functions import *
+
 v = sqlContext.createDataFrame([
   ("a", "Alice", 34),
   ("b", "Bob", 36),
@@ -12,7 +14,8 @@ v = sqlContext.createDataFrame([
   ("e", "Esther", 32),
   ("f", "Fanny", 36),
   ("g", "Gabby", 60)
-], ["id", "name", "age"])
+], ["id", "name", "age"]) \
+.withColumn("entity", lit("person"))
 
 # COMMAND ----------
 
@@ -35,18 +38,25 @@ display(g.vertices)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import *
-from pyspark.sql.types import *
-
-# COMMAND ----------
-
 # MAGIC %md ## Convert Vertices and Edges to Cosmos DB internal format
-# MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://vincentlauzon.com/2017/09/05/hacking-accessing-a-graph-in-cosmos-db-with-sql-documentdb-api/).
+# MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://vincentlauzon.com/2017/09/05/hacking-accessing-a-graph-in-cosmos-db-with-sql-documentdb-api/). Also `id` in Cosmos DB is [part of the resource URI](https://github.com/Azure/azure-cosmosdb-dotnet/issues/35#issuecomment-121009258) and hence must be URL encoded.
 
 # COMMAND ----------
 
-def to_cosmosdb_vertices(dfVertices, vertexLabel, partitionKey = ""):
-  columns = ["id"]
+from pyspark.sql.types import *
+from urllib.parse import quote
+
+def urlencode(value):
+  return quote(value, safe="")
+
+udf_urlencode = udf(urlencode, StringType())
+
+# COMMAND ----------
+
+def to_cosmosdb_vertices(dfVertices, labelColumn, partitionKey = ""):
+  dfVertices = dfVertices.withColumn("id", udf_urlencode("id"))
+  
+  columns = ["id", labelColumn]
   
   if partitionKey:
     columns.append(partitionKey)
@@ -54,16 +64,16 @@ def to_cosmosdb_vertices(dfVertices, vertexLabel, partitionKey = ""):
   columns.extend(['nvl2({x}, array(named_struct("id", uuid(), "_value", {x})), NULL) AS {x}'.format(x=x) \
                 for x in dfVertices.columns if x not in columns])
  
-  return dfVertices.selectExpr(*columns).withColumn("label", lit(vertexLabel))
+  return dfVertices.selectExpr(*columns).withColumnRenamed(labelColumn, "label")
 
 # COMMAND ----------
 
-cosmosDbVertices = to_cosmosdb_vertices(g.vertices, "person")
+cosmosDbVertices = to_cosmosdb_vertices(g.vertices, "entity")
 display(cosmosDbVertices)
 
 # COMMAND ----------
 
-def to_cosmosdb_edges(g, edgeLabelColumn, partitionKey = ""): 
+def to_cosmosdb_edges(g, labelColumn, partitionKey = ""): 
   dfEdges = g.edges
   
   if partitionKey:
@@ -73,10 +83,12 @@ def to_cosmosdb_edges(g, edgeLabelColumn, partitionKey = ""):
       .selectExpr("e.*", "sv." + partitionKey, "dv." + partitionKey + " AS _sinkPartition")
 
   dfEdges = dfEdges \
+    .withColumn("id", udf_urlencode(concat_ws("_", col("src"), col(labelColumn), col("dst")))) \
     .withColumn("_isEdge", lit(True)) \
-    .withColumnRenamed("src", "_vertexId") \
-    .withColumnRenamed("dst", "_sink") \
-    .withColumnRenamed(edgeLabelColumn, "label")
+    .withColumn("_vertexId", udf_urlencode("src")) \
+    .withColumn("_sink", udf_urlencode("dst")) \
+    .withColumnRenamed(labelColumn, "label") \
+    .drop("src", "dst")
   
   return dfEdges
 
