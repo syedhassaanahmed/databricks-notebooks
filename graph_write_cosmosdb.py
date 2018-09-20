@@ -1,6 +1,6 @@
 # Databricks notebook source
-# MAGIC %md # Write GraphFrames to Azure Cosmos DB Gremlin API
-# MAGIC Requires [graphframes](https://spark-packages.org/package/graphframes/graphframes) and [azure-cosmosdb-spark (uber jar)](http://repo1.maven.org/maven2/com/microsoft/azure/azure-cosmosdb-spark_2.3.0_2.11/1.2.0/) libraries to be uploaded and attached to the cluster
+# MAGIC %md # Writing GraphFrames to Azure Cosmos DB Gremlin API
+# MAGIC This notebook is based on the `GraphFrames` example [specified here](https://docs.azuredatabricks.net/spark/latest/graph-analysis/graphframes/user-guide-python.html). It requires [graphframes](https://spark-packages.org/package/graphframes/graphframes) and [azure-cosmosdb-spark (uber jar)](http://repo1.maven.org/maven2/com/microsoft/azure/azure-cosmosdb-spark_2.3.0_2.11/1.2.6/) libraries to be uploaded and attached to the cluster. **Scala version** of this notebook can be [found here](https://github.com/syedhassaanahmed/databricks-notebooks/blob/master/graphWriteCosmosDB.scala)
 
 # COMMAND ----------
 
@@ -39,7 +39,7 @@ display(g.vertices)
 # COMMAND ----------
 
 # MAGIC %md ## Convert Vertices and Edges to Cosmos DB internal format
-# MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://github.com/LuisBosquez/azure-cosmos-db-graph-working-guides/blob/master/graph-backend-json.md). Also `id` in Cosmos DB is [part of the resource URI](https://github.com/Azure/azure-cosmosdb-dotnet/issues/35#issuecomment-121009258) and hence must be URL encoded.
+# MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://vincentlauzon.com/2017/09/05/hacking-accessing-a-graph-in-cosmos-db-with-sql-documentdb-api/). Also `id` in Cosmos DB is [part of the resource URI](https://github.com/Azure/azure-cosmosdb-dotnet/issues/35#issuecomment-121009258) and hence must be URL encoded.
 
 # COMMAND ----------
 
