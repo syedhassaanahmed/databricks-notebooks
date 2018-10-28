@@ -1,10 +1,10 @@
 // Databricks notebook source
 // MAGIC %md # Writing GraphFrames to Azure Cosmos DB Gremlin API
-// MAGIC This notebook is based on the `GraphFrames` example [specified here](https://docs.azuredatabricks.net/spark/latest/graph-analysis/graphframes/user-guide-scala.html). It requires [graphframes](https://spark-packages.org/package/graphframes/graphframes) and [azure-cosmosdb-spark (uber jar)](http://repo1.maven.org/maven2/com/microsoft/azure/azure-cosmosdb-spark_2.3.0_2.11/1.2.6/) libraries to be uploaded and attached to the cluster. **Python version** of this notebook can be [found here](https://github.com/syedhassaanahmed/databricks-notebooks/blob/master/graph_write_cosmosdb.py)
+// MAGIC This notebook is based on the `GraphFrames` example [specified here](https://graphframes.github.io/user-guide.html#tab_scala_0). It requires [graphframes](https://spark-packages.org/package/graphframes/graphframes) and [azure-cosmosdb-spark (uber jar)](https://github.com/Azure/azure-cosmosdb-spark#using-databricks-notebooks) libraries to be uploaded and attached to the cluster. **Python version** of this notebook can be [found here](https://github.com/syedhassaanahmed/databricks-notebooks/blob/master/graph_write_cosmosdb.py)
 
 // COMMAND ----------
 
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.lit
 
 val v = sqlContext.createDataFrame(List(
   ("a", "Alice", 34),
@@ -32,20 +32,27 @@ val e = sqlContext.createDataFrame(List(
 
 // COMMAND ----------
 
-import org.graphframes._
+import org.graphframes.GraphFrame
 val g = GraphFrame(v, e)
+
+// COMMAND ----------
+
 display(g.vertices)
 
 // COMMAND ----------
 
+display(g.edges)
+
+// COMMAND ----------
+
 // MAGIC %md ## Convert Vertices and Edges to Cosmos DB internal format
-// MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://vincentlauzon.com/2017/09/05/hacking-accessing-a-graph-in-cosmos-db-with-sql-documentdb-api/). Also `id` in Cosmos DB is [part of the resource URI](https://github.com/Azure/azure-cosmosdb-dotnet/issues/35#issuecomment-121009258) and hence must be URL encoded.
+// MAGIC Cosmos DB Gremlin API internally keeps a JSON document representation of Edges and Vertices [as explained here](https://github.com/LuisBosquez/azure-cosmos-db-graph-working-guides/blob/master/graph-backend-json.md). Also `id` in Cosmos DB is [part of the resource URI](https://github.com/Azure/azure-cosmosdb-dotnet/issues/35#issuecomment-121009258) and hence must be URL encoded.
 
 // COMMAND ----------
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.StringType
 
 val urlEncode = (value: String) => {
   URLEncoder.encode(value, StandardCharsets.UTF_8.toString).replaceAll("\\+", "%20")
@@ -55,7 +62,7 @@ val udfUrlEncode = udf(urlEncode, StringType)
 
 // COMMAND ----------
 
-import org.apache.spark.sql._
+import org.apache.spark.sql.DataFrame
 import scala.collection.mutable.ListBuffer
 
 def toCosmosDBVertices(dfVertices: DataFrame, labelColumn: String, partitionKey: String = "") : DataFrame = {
@@ -79,6 +86,8 @@ val cosmosDbVertices = toCosmosDBVertices(g.vertices, "entity")
 display(cosmosDbVertices)
 
 // COMMAND ----------
+
+import org.apache.spark.sql.functions.{concat_ws, col}
 
 def toCosmosDBEdges(g: GraphFrame, labelColumn: String, partitionKey: String = "") : DataFrame = {
   var dfEdges = g.edges
