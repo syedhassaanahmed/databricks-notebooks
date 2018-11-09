@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md ## Hierarchical data traversal in GraphFrames using [Belief Propagation](https://graphframes.github.io/api/python/_modules/graphframes/examples/belief_propagation.html#BeliefPropagation)
-# MAGIC [graphframes](https://spark-packages.org/package/graphframes/graphframes) library must be uploaded and attached to the cluster.
+# MAGIC Requires **Spark 2.4**. [Graphframes](https://spark-packages.org/package/graphframes/graphframes) library must be uploaded and attached to the cluster.
 
 # COMMAND ----------
 
@@ -68,14 +68,7 @@ display(g.vertices)
 
 # COMMAND ----------
 
-from pyspark.sql.types import *
+dfParents = g.vertices.selectExpr("id", "name",
+            "map_from_arrays(transform(sequence(1, size(parents)), x -> concat('L', x)), parents) AS parents")
 
-def get_level(arr):
-    return {"L" + str(idx + 1): i for idx, i in enumerate(arr or [])}
-
-udf_get_level = udf(get_level, MapType(StringType(), StringType()))
-
-# COMMAND ----------
-
-dfResult = g.vertices.withColumn("parents", udf_get_level(col("parents")))
-display(dfResult.orderBy("id"))
+display(dfParents)
