@@ -1,5 +1,5 @@
 -- Databricks notebook source
-CREATE TABLE IF NOT EXISTS CosmosDBStream(column1 int, colunm2 string, column3 timestamp)
+CREATE TABLE IF NOT EXISTS CosmosDBStream(column1 int, column2 string, column3 timestamp)
 USING com.microsoft.azure.cosmosdb.spark
 OPTIONS
 (
