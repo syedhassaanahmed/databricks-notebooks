@@ -1,5 +1,6 @@
 # Databricks notebook source
-# MAGIC %md #### For best performance use 5 instances of `Standard_DS15_v2` (Memory Optimized) as Worker Node
+# MAGIC %md ## Generate Large Timeseries CSV
+# MAGIC For best performance we used 5 instances of `Standard_DS15_v2` (Memory Optimized) as Worker Node
 
 # COMMAND ----------
 
@@ -45,6 +46,7 @@ dfTimeseriesA = generate_timeseries(start_time, days_back, industrial_plants, "A
 
 dfTimeseriesA.write \
   .mode("overwrite") \
+  .option("compression", "gzip") \
   .partitionBy("year", "month", "day") \
   .csv(blob_root + "/A")
 
@@ -57,5 +59,6 @@ dfTimeseriesB = generate_timeseries(start_time, days_back, industrial_plants, "B
 
 dfTimeseriesB.write \
   .mode("overwrite") \
+  .option("compression", "gzip") \
   .partitionBy("year", "month", "day") \
   .csv(blob_root + "/B")
