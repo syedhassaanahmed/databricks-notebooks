@@ -4,7 +4,6 @@
 # COMMAND ----------
 
 import pyspark.sql.functions as F
-from pyspark.sql.window import Window
 import time
 
 days_back = 120
@@ -16,8 +15,7 @@ start_time = time.time()
 
 def get_sensors(industrial_plants, sensors_per_plant):
   return spark.range(0, industrial_plants * sensors_per_plant) \
-    .selectExpr("uuid() AS Sensor") \
-    .withColumn("RowNum", F.row_number().over(Window.orderBy("Sensor"))) \
+    .selectExpr("id as RowNum", "uuid() AS Sensor") \
     .withColumn("plant", F.col("RowNum") % industrial_plants)
 
 # COMMAND ----------
@@ -27,7 +25,7 @@ def generate_timeseries(df_sensors, start_time, days_back, sensor_frequency):
   values_per_second = total_sensors * sensor_frequency
     
   return spark.range(0, days_back * 24 * 60 * 60 * values_per_second, 1, 8000) \
-    .withColumn("RowNum", 1 + (F.col("id") % total_sensors)) \
+    .withColumn("RowNum", F.col("id") % total_sensors) \
     .join(df_sensors, "RowNum") \
     .withColumn("Timestamp", (start_time - (F.col("id") / values_per_second)).cast("Timestamp")) \
     .withColumn("Value", F.round(F.rand() * 100, 16)) \
