@@ -43,6 +43,7 @@ dbutils.fs.put(schemaFile, schema)
 # MAGIC %fs ls
 
 # COMMAND ----------
+from pyspark.sql.types import StructType
 
 with open("/dbfs/schema.json") as jsonData:
     schema = StructType.fromJson(json.load(jsonData))
