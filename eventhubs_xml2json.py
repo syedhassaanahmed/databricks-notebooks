@@ -33,8 +33,6 @@ xml_to_json = udf(xml_to_json_func, StringType())
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
-
 processed = xmlStream.withColumn("jsonBody", xml_to_json("xmlBody"))
 display(processed)
 
