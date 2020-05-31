@@ -108,6 +108,10 @@ display(cosmosDbEdges)
 
 # COMMAND ----------
 
+# MAGIC %md ## Make sure to use the [Cosmos DB https endpoint](https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-use-regional-gremlin#portal-endpoint-discovery) and **NOT** the `wss://` endpoint
+
+# COMMAND ----------
+
 cosmosDbConfig = {
   "Endpoint" : "https://<COSMOSDB_ENDPOINT>.documents.azure.com:443/",
   "Masterkey" : "<COSMOSDB_PRIMARYKEY>",
