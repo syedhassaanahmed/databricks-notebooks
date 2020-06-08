@@ -117,6 +117,10 @@ display(cosmosDbEdges)
 
 // COMMAND ----------
 
+// MAGIC %md ## Make sure to use the [Cosmos DB https endpoint](https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-use-regional-gremlin#portal-endpoint-discovery) and **NOT** the `wss://` endpoint
+
+// COMMAND ----------
+
 import com.microsoft.azure.cosmosdb.spark.config.Config
 import com.microsoft.azure.cosmosdb.spark.schema._
 import org.apache.spark.sql.SaveMode
