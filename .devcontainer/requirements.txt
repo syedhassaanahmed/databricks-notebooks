@@ -1,4 +1,5 @@
+html5lib
 jupyter
-pandas
 lxml
 matplotlib
+pandas
