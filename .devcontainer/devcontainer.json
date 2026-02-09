@@ -1,21 +1,14 @@
 {
-    "build": { 
-        "dockerfile": "Dockerfile" 
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-toolsai.jupyter"
-            ]
-        },
-        "codespaces": {
-            "repositories": {
-                "devcontainers/features": {
-                    "permissions": "write-all"
-                }
-            }
-        }
-    },
-    "postCreateCommand": "git config --global --add safe.directory /workspaces/databricks-notebooks"
+  "name": "Python 3.14 Jupyter",
+  "image": "mcr.microsoft.com/devcontainers/python:3.14",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "remoteUser": "vscode"
 }

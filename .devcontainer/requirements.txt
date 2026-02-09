@@ -1,5 +1,0 @@
-html5lib
-jupyter
-lxml
-matplotlib
-pandas

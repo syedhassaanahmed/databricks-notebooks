@@ -1,0 +1,8 @@
+ipykernel
+pandas
+lxml
+curl_cffi
+html5lib
+beautifulsoup4
+matplotlib
+adjustText
